@@ -5,7 +5,8 @@ from fabric.api import *
 
 
 class GetLinuxData():
-    def __init__(self, GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS,GET_CPU_INFO, GET_MEMORY_INFO,
+    def __init__(self, GET_SERIAL_INFO, ADD_HDD_AS_DEVICE_PROPERTIES, ADD_HDD_AS_PARTS,
+                        GET_HARDWARE_INFO, GET_OS_DETAILS,GET_CPU_INFO, GET_MEMORY_INFO,
                         IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE,DEBUG):
 
         self.GET_SERIAL_INFO    = GET_SERIAL_INFO

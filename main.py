@@ -52,11 +52,9 @@ def upload(data):
             if name and 'device' in rec:
                 rec['device'] = name
             rest.post_mac(rec)
-
     # upload hdd_parts if any
     if hdd_parts:
         rest.post_parts(hdd_parts)
-
 def get_linux_data():
     print '[+] Collecting data from: %s' % env.host_string
     linux = ml.GetLinuxData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
@@ -138,23 +136,14 @@ def check_os():
         upload(data)
 
 def main():
-    if TARGETS:
-        ipops = ipop.IP_Operations(TARGETS)
-        ip_scope = ipops.sort_ip()
-
-        if not ip_scope:
-            msg =  '[!] Empty IP address scope! Please, check target IP address[es].'
-            print msg
-            sys.exit()
-        else:
-            with settings(
-                hide('warnings', 'running', 'stdout', 'stderr'),
-                warn_only=True,
-                shell="/bin/sh -c"
-            ):
-                env.skip_bad_hosts=True
-                execute(check_os,hosts=ip_scope)
-            sys.exit(0)
+    with settings(
+        hide('warnings', 'running', 'stdout', 'stderr'),
+        warn_only=True,
+        shell="/bin/sh -c"
+    ):
+        env.skip_bad_hosts=True
+        execute(check_os,hosts=ip_scope)
+    sys.exit(0)
 
 if __name__ == '__main__':
     from module_shared import *
