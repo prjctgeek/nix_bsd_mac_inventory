@@ -136,6 +136,14 @@ class GetLinuxData():
                                                 'Microsoft Corporation', 'Xen', 'innotek GmbH']:
                                 dev_type = 'virtual'
                                 self.devargs.update({ 'type' : dev_type})
+                                if manufacturer == 'VMware, Inc.':
+                                    self.devargs.update({ 'virtual_subtype' : 'vmware' })
+                                elif manufacturer == 'KVM':
+                                    self.devargs.update({ 'virtual_subtype' : 'kvm' })
+                                elif manufacturer == 'Microsoft Corporation':
+                                    self.devargs.update({ 'virtual_subtype' : 'hyperv' })
+                                elif manufacturer == 'Xen':
+                                    self.devargs.update({ 'virtual_subtype' : 'citrix' })
                         if rec.startswith('UUID:'):
                             uuid = rec.split(':')[1].strip()
                             self.devargs.update({ 'uuid' : uuid})
