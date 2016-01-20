@@ -359,7 +359,7 @@ class GetLinuxData():
 
     def get_hdd_names(self):
         hdd_names = []
-        cmd = '/sbin/fdisk -l | grep "Disk /dev"'
+        cmd = '/sbin/fdisk -l | grep "Disk /dev/[sh]da"'
         data_out,data_err = self.execute(cmd, True)
         errhdds = []
         if data_err:
@@ -400,10 +400,13 @@ class GetLinuxData():
         cmd = 'hdparm -I %s' % hdd
         data_out,data_err = self.execute(cmd, True)
         if data_err:
+            if self.DEBUG:
+                print '[-] ERROR: %s' % data_err
             return
         else:
             for rec in data_out:
                 if 'model number' in rec.lower():
+                    print rec.lower
                     model   = rec.split(':')[1].strip()
                     size    = self.disk_sizes[hdd]
                     self.hdd_parts.update({'device':self.device_name})

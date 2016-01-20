@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""
+Rework device42 inventory script to use fabric for ssh connections
+Parallel work will be done differently
+"""
+
 __version__ = "3.0"
 
 # Import Fabric API
@@ -57,7 +62,8 @@ def upload(data):
         rest.post_parts(hdd_parts)
 def get_linux_data():
     print '[+] Collecting data from: %s' % env.host_string
-    linux = ml.GetLinuxData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
+    linux = ml.GetLinuxData(GET_SERIAL_INFO, ADD_HDD_AS_DEVICE_PROPERTIES, ADD_HDD_AS_PARTS, \
+                            GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
                             IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
     data = linux.main()
     if DEBUG:
@@ -132,18 +138,27 @@ def check_os():
         print '\tInfo: %s\n\tSkipping... ' % str(msg)
     if DICT_OUTPUT:
         return data
-    else:
-        upload(data)
+    #else:
+    #    upload(data)
 
 def main():
-    with settings(
-        hide('warnings', 'running', 'stdout', 'stderr'),
-        warn_only=True,
-        shell="/bin/sh -c"
-    ):
-        env.skip_bad_hosts=True
-        execute(check_os,hosts=ip_scope)
-    sys.exit(0)
+    if TARGETS:
+        ipops = ipop.IP_Operations(TARGETS)
+        ip_scope = ipops.sort_ip()
+
+        if not ip_scope:
+            msg =  '[!] Empty IP address scope! Please, check target IP address[es].'
+            print msg
+            sys.exit()
+        else:
+            with settings(
+                hide('warnings', 'running', 'stdout', 'stderr'),
+                warn_only=True,
+                shell="/bin/sh -c"
+            ):
+                env.skip_bad_hosts=True
+                execute(check_os,hosts=ip_scope)
+            sys.exit(0)
 
 if __name__ == '__main__':
     from module_shared import *
@@ -152,4 +167,3 @@ if __name__ == '__main__':
 else:
     # you can use dict_output if called from external script (starter.py)
     from module_shared import *
-
