@@ -25,7 +25,7 @@ class GetAixData():
         self.allData.append(self.sysData)
         return self.allData
 
-    def execute(cmd):
+    def execute(self, cmd):
         # Since there seems to be no sudo commands for this module
         output = run(cmd)
         data_err = output.stderr
