@@ -406,7 +406,6 @@ class GetLinuxData():
         else:
             for rec in data_out:
                 if 'model number' in rec.lower():
-                    print rec.lower
                     model   = rec.split(':')[1].strip()
                     size    = self.disk_sizes[hdd]
                     self.hdd_parts.update({'device':self.device_name})
