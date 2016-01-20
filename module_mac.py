@@ -1,62 +1,56 @@
 import sys
 import re
-import paramiko
 import math
 import urllib2, urllib
 from base64 import b64encode
+# Import Fabric API
+from fabric.api import *
 
 
 class GetMacData():
-    def __init__(self, BASE_URL, USERNAME, SECRET,  ip, SSH_PORT, TIMEOUT, usr, pwd, USE_KEY_FILE, KEY_FILE, \
-                        GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, \
+    def __init__(self, GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, \
                         GET_CPU_INFO, GET_MEMORY_INFO, IGNORE_DOMAIN, UPLOAD_IPV6, DEBUG):
-        
-        self.D42_API_URL     = BASE_URL
-        self.D42_USERNAME  = USERNAME
-        self.D42_PASSWORD = SECRET
-        self.machine_name   = ip
-        self.port                 = int(SSH_PORT)
-        self.timeout             = TIMEOUT
-        self.username          = usr
-        self.password           = pwd
         self.USE_KEY_FILE            = USE_KEY_FILE
         self.KEY_FILE                   = KEY_FILE
         self.GET_SERIAL_INFO       = GET_SERIAL_INFO
         self.GET_HARDWARE_INFO  = GET_HARDWARE_INFO
         self.GET_OS_DETAILS        = GET_OS_DETAILS
         self.GET_CPU_INFO           = GET_CPU_INFO
-        self.GET_MEMORY_INFO     = GET_MEMORY_INFO 
-        self.IGNORE_DOMAIN         = IGNORE_DOMAIN       
+        self.GET_MEMORY_INFO     = GET_MEMORY_INFO
+        self.IGNORE_DOMAIN         = IGNORE_DOMAIN
         self.UPLOAD_IPV6             = UPLOAD_IPV6
         self.DEBUG                       = DEBUG
-        
-        self.ssh = paramiko.SSHClient()
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
         self.allData  = []
         self.devargs = {}
         self.device_name = None
-        
-        
-        
+
+
+
     def main(self):
-        self.connect()
         self.get_SYS()
         self.get_IP()
         return self.allData
-        
-    def connect(self):
-        try:
-            if not self.USE_KEY_FILE: 
-                self.ssh.connect(str(self.machine_name), port=self.port, username=self.username, password=self.password, timeout=self.timeout)
-            else: 
-                self.ssh.connect(str(self.machine_name), port=self.port, username=self.username, key_filename=self.KEY_FILE, timeout=self.timeout)
-        except paramiko.AuthenticationException:
-            print str(self.machine_name) + ': authentication failed'
-            return None
-        except Exception as err:
-            print str(self.machine_name) + ': ' + str(err)
-            return  None
-        
+
+    def execute(self, cmd, needroot = False):
+        if needroot:
+            output = sudo(cmd, combine_stderr=False)
+            if self.DEBUG:
+                print '[-] DEBUG: sudo(%s)' % cmd
+        else:
+            output = run(cmd, combine_stderr=False)
+            if self.DEBUG:
+                print '[-] DEBUG: run(%s)' % cmd
+        data_err = output.stderr
+        data_out = output.stdout
+        # some OSes do not have sudo by default! We can try some of the commands without it (cat /proc/meminfo....)
+        if data_err and 'sudo: command not found' in str(data_err):
+            output = run(cmd, combin_stderr=False)
+            if self.DEBUG:
+                print '[-] DEBUG: run(%s)' % cmd
+            data_err = output.stderr
+            data_out = output.stdout
+        return data_out.splitlines(),data_err.splitlines()
 
     def to_ascii(self, s):
         try: return s.encode('ascii','ignore')
@@ -69,13 +63,10 @@ class GetMacData():
         elif v < 8192: v = 1024 * math.ceil(v / 1024.0)
         else: v = 2048 * math.ceil(v / 2048.0)
         return int(v)
-    
+
     def get_name(self):
-        stdin, stdout, stderr = self.ssh.exec_command("/bin/hostname")
-        data_err = stderr.readlines()
-        data_out = stdout.readlines()
+        data_out, data_err = self.execute("/bin/hostname")
         device_name = None
-        #print 'hostname : %s' % data_out 
         if not data_err:
             if self.IGNORE_DOMAIN: device_name = self.to_ascii(data_out[0].rstrip()).split('.')[0]
             else: device_name = self.to_ascii(data_out[0].rstrip())
@@ -85,23 +76,18 @@ class GetMacData():
         else:
             if self.DEBUG:
                 print data_err
-        
+
         if not device_name:
             return None
 
     def get_SYS(self):
         device_name = self.get_name()
-        
+
         if device_name != '':
             self.device_name = device_name
             #GET SW_DATA
             if self.GET_OS_DETAILS:
-                stdin, stdout, stderr = self.ssh.exec_command("sudo -S -p '' /usr/bin/sw_vers")
-                stdin.write('%s\n' % self.password)
-                stdin.flush()
-                data_err = stderr.readlines()
-                data_out = stdout.readlines()
-                #print ''.join(data_out).split('\n')
+                data_out,data_err = self.execute('/usr/bin/sw_vers', True)
                 if not data_err:
                     if len(data_out) > 0:
                         for rec in ''.join(data_out).split('\n'):
@@ -110,18 +96,14 @@ class GetMacData():
                                 self.devargs.update({'os':os})
                             if 'ProductVersion' in rec:
                                 osver = rec.split(':')[1].strip()
-                                self.devargs.update({'osver':osver}) 
+                                self.devargs.update({'osver':osver})
                 else:
                     if self.DEBUG:
                         print data_err
 
             # GET KERNEL VERSION
             if self.GET_OS_DETAILS:
-                stdin, stdout, stderr = self.ssh.exec_command("sudo -S -p '' /usr/bin/uname -r")
-                stdin.write('%s\n' % self.password)
-                stdin.flush()
-                data_err = stderr.readlines()
-                data_out = stdout.readlines()
+                data_out,data_err = self.execute('/usr/bin/uname -r', True)
                 if not data_err:
                     if len(data_out) > 0:
                         osverno = data_out[0].strip()
@@ -129,13 +111,9 @@ class GetMacData():
                 else:
                     if self.DEBUG:
                         print data_err
-            
+
             # GET HW DATA
-            stdin, stdout, stderr = self.ssh.exec_command("sudo -S -p '' /usr/sbin/system_profiler SPHardwareDataType")
-            stdin.write('%s\n' % self.password)
-            stdin.flush()
-            data_err = stderr.readlines()
-            data_out = stdout.readlines()
+            data_out,data_err = self.execute("/usr/sbin/system_profiler SPHardwareDataType", True)
             if not data_err:
                 if len(data_out) > 0:
                     for rec in ''.join(data_out).split('\n'):
@@ -169,16 +147,14 @@ class GetMacData():
         else:
             if self.DEBUG:
                 print data_err
-    
+
         self.allData.append(self.devargs)
 
 
-            
+
     def get_IP(self):
         addresses = {}
-        stdin, stdout, stderr = self.ssh.exec_command("/sbin/ifconfig")
-        data_out = stdout.readlines()
-        data_err  = stderr.readlines()
+        data_out, data_err = self.execute("/sbin/ifconfig")
         if not data_err:
             nics = []
             tmp = []
@@ -186,12 +162,12 @@ class GetMacData():
                 if not rec.startswith('\t'):
                     if not tmp == []:
                         nics.append(tmp)
-                  
+
                         tmp =[]
                     tmp.append(rec)
                 else:
                     tmp.append(rec)
-                    
+
             nics.append(tmp)
             for nic in nics:
                 nic_name = nic[0].split()[0].strip(':')
@@ -225,4 +201,4 @@ class GetMacData():
                     self.allData.append(macData)
         else:
             if self.DEBUG:
-                print data_err 
+                print data_err
