@@ -138,8 +138,8 @@ def check_os():
         print '\tInfo: %s\n\tSkipping... ' % str(msg)
     if DICT_OUTPUT:
         return data
-    #else:
-    #    upload(data)
+    else:
+        upload(data)
 
 def main():
     if TARGETS:
