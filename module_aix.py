@@ -1,21 +1,13 @@
 import sys
-import paramiko
 import util_uploader
+# Import Fabric API
+from fabric.api import *
 
 
 
 class GetAixData():
-    def __init__(self,  ip, SSH_PORT, TIMEOUT, usr, pwd, USE_KEY_FILE, KEY_FILE, \
-                    GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, \
+    def __init__(self, GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, \
                     GET_CPU_INFO, GET_MEMORY_INFO, IGNORE_DOMAIN, UPLOAD_IPV6, DEBUG):
-        self.machine_name       = ip
-        self.port               = int(SSH_PORT)
-        self.timeout            = TIMEOUT
-        self.username           = usr
-        self.password           = pwd
-        self.ssh                = paramiko.SSHClient()
-        self.USE_KEY_FILE       = USE_KEY_FILE
-        self.KEY_FILE           = KEY_FILE
         self.GET_SERIAL_INFO    = GET_SERIAL_INFO
         self.GET_HARDWARE_INFO  = GET_HARDWARE_INFO
         self.GET_OS_DETAILS     = GET_OS_DETAILS
@@ -24,51 +16,34 @@ class GetAixData():
         self.IGNORE_DOMAIN      = IGNORE_DOMAIN
         self.UPLOAD_IPV6        = UPLOAD_IPV6
         self.DEBUG              = DEBUG
-        self.ssh                = paramiko.SSHClient()
-        self.conn               = None
         self.sysData            = {}
         self.allData            = []
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     def main(self):
-        self.connect()
         self.get_sys()
         self.get_IP()
         self.allData.append(self.sysData)
         return self.allData
 
-
-    def connect(self):
-        try:
-            if not self.USE_KEY_FILE: 
-                self.ssh.connect(str(self.machine_name), port=self.port, \
-                username=self.username, password=self.password, timeout=self.timeout)
-            else: 
-                self.ssh.connect(str(self.machine_name), port=self.port, \
-                username=self.username, key_filename=self.KEY_FILE, timeout=self.timeout)
-        except paramiko.AuthenticationException:
-            print str(self.machine_name) + ': authentication failed'
-            return None
-        except Exception as err:
-            print str(self.machine_name) + ': ' + str(err)
-            return  None
-
-
+    def execute(cmd):
+        # Since there seems to be no sudo commands for this module
+        output = run(cmd)
+        data_err = output.stderr
+        data_out = output.stdout
+        return data_out.splitlines(),data_err.splitlines()
 
     def get_sys(self):
         if self.GET_CPU_INFO:
             cmd = 'lsconf | egrep -i "system model|machine serial|processor type|number of processors|' \
                   'processor clock speed|cpu type|kernel type|^memory size|disk drive|host name"; oslevel'
-            stdin, stdout, stderr = self.ssh.exec_command(cmd)
-            data_out = stdout.readlines()
-            data_err  = stderr.readlines()
-            
+            data_out, data_err = execute(cmd)
+
             if not data_err:
                 osver = data_out[-1].strip()
                 self.sysData.update({'osver':osver})
                 self.sysData.update({'os':'AIX'})
                 disknum = 0
-                
+
                 for x in data_out:
                     if 'System Model' in x:
                         model = x.strip()
@@ -97,18 +72,16 @@ class GetAixData():
                         devicename = x.split()[-1].strip()
                         self.name = devicename
                         self.sysData.update({'name':self.name})
-                        
+
                 self.sysData.update({'hddcount':disknum})
         else:
             print data_err
-            
+
 
 
     def get_MAC(self, nicname):
         cmd = "entstat -d %s| grep -i 'hardware address'" % nicname
-        stdin, stdout, stderr = self.ssh.exec_command(cmd)
-        data_out = stdout.readlines()
-        data_err  = stderr.readlines()
+        data_out, data_err = execute(cmd)
         if not data_err:
             mac = data_out[0].split()[2].strip()
             return mac
@@ -120,10 +93,9 @@ class GetAixData():
 
     def get_IP(self):
         addresses = {}
-        stdin, stdout, stderr = self.ssh.exec_command("/usr/sbin/ifconfig -a")
-        data_out = stdout.readlines()
-        data_err  = stderr.readlines()
-        
+        cmd = '/usr/sbin/ifconfig -a'
+        data_out, data_err = execute(cmd)
+
         if not data_err:
             nics = []
             header = ''
@@ -138,7 +110,7 @@ class GetAixData():
                         header = ''
                         header += rec
             nics.append(list(header.split('\n')))
-            
+
             for nic in nics:
                 ips = []
                 nicname = nic[0].split(':')[0]
@@ -151,7 +123,7 @@ class GetAixData():
                             ip = rec.split()[1]
                             if '/' in ip: # ipv6
                                 ip = ip.split('/')[0]
-                                
+
                             name = self.name
                             nicData.update({'ipaddress':ip})
                             nicData.update({'macaddress':mac})
@@ -164,16 +136,14 @@ class GetAixData():
                                 macData.update({'port_name':nicname})
                                 macData.update({'device':name})
                                 self.allData.append(macData)
-                            
+
         else:
             print 'Error: ', data_err
 
 
     def get_hdd_size(self, hddname):
         cmd = "bootinfo -s %s" % hddname
-        stdin, stdout, stderr = self.ssh.exec_command(cmd)
-        data_out = stdout.readlines()
-        data_err  = stderr.readlines()
+        data_out, data_err = execute(cmd)
         if not data_err:
             size = int(data_out[0].strip())/1024
             return str(size)
