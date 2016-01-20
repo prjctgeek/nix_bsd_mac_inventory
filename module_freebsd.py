@@ -29,7 +29,7 @@ class GetBSDData():
         self.allData.append(self.sysData)
         return self.allData
 
-    def execute(cmd):
+    def execute(self, cmd):
         # Since there seems to be no sudo commands for this module
         output = run(cmd)
         data_err = output.stderr
@@ -38,7 +38,7 @@ class GetBSDData():
 
     def get_CPU(self):
         if self.GET_CPU_INFO:
-            data_out, data_err = execute(" sysctl -n hw.model sysctl hw.ncpu")
+            data_out, data_err = self.execute(" sysctl -n hw.model sysctl hw.ncpu")
             if not data_err:
                 cpumodel = data_out[0].strip()
                 cpucount = data_out[1].strip()
@@ -49,7 +49,7 @@ class GetBSDData():
 
     def get_RAM(self):
         if self.GET_MEMORY_INFO:
-            data_out, data_err = execute("grep memory /var/run/dmesg.boot")
+            data_out, data_err = self.execute("grep memory /var/run/dmesg.boot")
             if not data_err:
                 for rec in data_out:
                     if 'real' in rec:
@@ -59,7 +59,7 @@ class GetBSDData():
                 print 'Error: ', data_err
 
     def get_name(self):
-        data_out, data_err = execute("/bin/hostname -f")
+        data_out, data_err = self.execute("/bin/hostname -f")
         if not data_err:
             full_name = data_out[0].strip()
             if self.IGNORE_DOMAIN:
@@ -74,7 +74,7 @@ class GetBSDData():
 
     def get_IP(self):
         addresses = {}
-        data_out, data_err = execute("ifconfig")
+        data_out, data_err = self.execute("ifconfig")
         if not data_err:
             nics  = []
             tmpv4 = {}
@@ -142,7 +142,7 @@ class GetBSDData():
 
     def get_sys(self):
         self.device_name = self.get_name()
-        data_out, data_err = execute("uname -srK")
+        data_out, data_err = self.execute("uname -srK")
         if not data_err:
             data = ' '.join(data_out).split()
             os  = data[0].strip()
@@ -155,7 +155,7 @@ class GetBSDData():
         else:
             print 'Error: ', data_err
 
-        data_out, data_err = execute("sysctl -n kern.vm_guest ; sysctl -n kern.hostuuid")
+        data_out, data_err = self.execute("sysctl -n kern.vm_guest ; sysctl -n kern.hostuuid")
         if not data_err:
             uuid = data_out[1].strip()
             self.sysData.update({'uuid':uuid})
