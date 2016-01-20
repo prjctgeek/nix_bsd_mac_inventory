@@ -1,25 +1,13 @@
 import ast
 import math
-import paramiko
-import traceback
+# Import Fabric API
+from fabric.api import *
 
 
 class GetLinuxData():
-    def __init__(self, BASE_URL, USERNAME, SECRET,  ip, SSH_PORT, TIMEOUT, usr, pwd, USE_KEY_FILE, KEY_FILE,
-                        GET_SERIAL_INFO, ADD_HDD_AS_DEVICE_PROPERTIES, ADD_HDD_AS_PARTS,
-                        GET_HARDWARE_INFO, GET_OS_DETAILS,GET_CPU_INFO, GET_MEMORY_INFO,
+    def __init__(self, GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS,GET_CPU_INFO, GET_MEMORY_INFO,
                         IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE,DEBUG):
 
-        self.D42_API_URL        = BASE_URL
-        self.D42_USERNAME       = USERNAME
-        self.D42_PASSWORD       = SECRET
-        self.machine_name       = ip
-        self.port               = int(SSH_PORT)
-        self.timeout            = TIMEOUT
-        self.username           = usr
-        self.password           = pwd
-        self.USE_KEY_FILE       = USE_KEY_FILE
-        self.KEY_FILE           = KEY_FILE
         self.GET_SERIAL_INFO    = GET_SERIAL_INFO
         self.GET_HARDWARE_INFO  = GET_HARDWARE_INFO
         self.GET_OS_DETAILS     = GET_OS_DETAILS
@@ -39,11 +27,8 @@ class GetLinuxData():
 
         self.allData    = []
         self.devargs    = {}
-        self.ssh        = paramiko.SSHClient()
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     def main(self):
-        self.connect()
         self.are_u_root()
         self.get_system()
         if self.GET_MEMORY_INFO:
@@ -77,24 +62,24 @@ class GetLinuxData():
 
 
     def execute(self, cmd, needroot = False):
-        if needroot:
-            if self.root:
-                stdin, stdout, stderr = self.ssh.exec_command(cmd)
-            else:
-                cmd_sudo = "sudo -S -p '' %s" % cmd
-                stdin, stdout, stderr = self.ssh.exec_command(cmd_sudo)
-                stdin.write('%s\n' % self.password)
-                stdin.flush()
+        if needroot and self.root == False:
+            output = sudo(cmd, combine_stderr=False)
+            if self.DEBUG:
+                print '[-] DEBUG: sudo(%s)' % cmd
         else:
-            stdin, stdout, stderr = self.ssh.exec_command(cmd)
-        data_err = stderr.readlines()
-        data_out = stdout.readlines()
-
+            output = run(cmd, combine_stderr=False)
+            if self.DEBUG:
+                print '[-] DEBUG: run(%s)' % cmd
+        data_err = output.stderr
+        data_out = output.stdout
+        # some OSes do not have sudo by default! We can try some of the commands without it (cat /proc/meminfo....)
         if data_err and 'sudo: command not found' in str(data_err):
-            stdin, stdout, stderr = self.ssh.exec_command(cmd)
-            data_err = stderr.readlines()
-            data_out = stdout.readlines()
-        return data_out,data_err
+            output = run(cmd, combin_stderr=False)
+            if self.DEBUG:
+                print '[-] DEBUG: run(%s)' % cmd
+            data_err = output.stderr
+            data_out = output.stdout
+        return data_out.splitlines(),data_err.splitlines()
 
     def are_u_root(self):
         cmd = 'id -u'
