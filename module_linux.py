@@ -45,22 +45,6 @@ class GetLinuxData():
 
         return self.allData
 
-    def connect(self):
-        try:
-            if not self.USE_KEY_FILE:
-                self.ssh.connect(str(self.machine_name), port=self.port,
-                                 username=self.username, password=self.password, timeout=self.timeout)
-            else:
-                self.ssh.connect(str(self.machine_name), port=self.port,
-                                 username=self.username, key_filename=self.KEY_FILE, timeout=self.timeout)
-        except paramiko.AuthenticationException:
-            print str(self.machine_name) + ': authentication failed'
-            return None
-        except Exception as err:
-            print str(self.machine_name) + ': ' + str(err)
-            return  None
-
-
     def execute(self, cmd, needroot = False):
         if needroot and self.root == False:
             output = sudo(cmd, combine_stderr=False)
