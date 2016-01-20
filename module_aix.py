@@ -36,7 +36,7 @@ class GetAixData():
         if self.GET_CPU_INFO:
             cmd = 'lsconf | egrep -i "system model|machine serial|processor type|number of processors|' \
                   'processor clock speed|cpu type|kernel type|^memory size|disk drive|host name"; oslevel'
-            data_out, data_err = execute(cmd)
+            data_out, data_err = self.execute(cmd)
 
             if not data_err:
                 osver = data_out[-1].strip()
@@ -81,7 +81,7 @@ class GetAixData():
 
     def get_MAC(self, nicname):
         cmd = "entstat -d %s| grep -i 'hardware address'" % nicname
-        data_out, data_err = execute(cmd)
+        data_out, data_err = self.execute(cmd)
         if not data_err:
             mac = data_out[0].split()[2].strip()
             return mac
@@ -94,7 +94,7 @@ class GetAixData():
     def get_IP(self):
         addresses = {}
         cmd = '/usr/sbin/ifconfig -a'
-        data_out, data_err = execute(cmd)
+        data_out, data_err = self.execute(cmd)
 
         if not data_err:
             nics = []
@@ -143,7 +143,7 @@ class GetAixData():
 
     def get_hdd_size(self, hddname):
         cmd = "bootinfo -s %s" % hddname
-        data_out, data_err = execute(cmd)
+        data_out, data_err = self.execute(cmd)
         if not data_err:
             size = int(data_out[0].strip())/1024
             return str(size)
