@@ -20,6 +20,12 @@ secret     =  adm!nd42
 # range: 192.168.1.101-192.168.1.150
 # cidr block: 192.168.1.0/24
 # any combination of above: 192.168.3.0/24,192.168.4.1-192.168.4.10,192.168.55.22,10.0.0.0/24
+# A username can be associated with any single, range or cidr block. Without a username, 
+# the username of the user running the script is assumed
+# For example: username@192.168.1.0/24 or root@192.168.101-192.168.1.150
+# In addition, a port can be added to each target
+# For example: 192.168.1.0/24:2220 or 192.168.101-192.168.1.150:2220
+# If no port is given, 22 is assume
 targets   =
 
 [credentials]
@@ -30,7 +36,7 @@ targets   =
 use_key_file = False
 key_file     =
 # You can use as many USER:PWD combinations as you like separated by commas.
-# TIP: put more frequently used combinations at the beginning of line
+# If this is set, the script will run it's checks in parallel
 # For example: credentials = user:P@ssw0rd,root:P@ssw0rd
 # If using key file, instead of user:password combination use just username
 # For example: credentials = root
@@ -38,7 +44,6 @@ credentials   =
 
 
 [ssh_settings]
-ssh_port      = 22
 timeout       = 10
 
 [options]

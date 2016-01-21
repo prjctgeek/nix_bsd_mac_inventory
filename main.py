@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 
 """
 Rework device42 inventory script to use fabric for ssh connections
@@ -143,21 +143,37 @@ def check_os():
 
 def main():
     if TARGETS:
-        ipops = ipop.IP_Operations(TARGETS)
-        ip_scope = ipops.sort_ip()
+        ipops = ipop.IP_Operations(TARGETS, CREDENTIALS)
+        ip_scope,passwords = ipops.sort_ip()
 
         if not ip_scope:
             msg =  '[!] Empty IP address scope! Please, check target IP address[es].'
             print msg
             sys.exit()
         else:
-            with settings(
-                hide('warnings', 'running', 'stdout', 'stderr'),
-                warn_only=True,
-                shell="/bin/sh -c"
-            ):
-                env.skip_bad_hosts=True
-                execute(check_os,hosts=ip_scope)
+            if passwords:
+                with settings(
+                    hide('warnings', 'running', 'stdout', 'stderr'),
+                    warn_only=True,
+                    shell="/bin/sh -c",
+                    timeout=TIMEOUT,
+                    parallel=True
+                ):
+                    print "Running parallel"
+                    env.passwords = passwords
+                    print env.passwords
+                    env.skip_bad_hosts=True
+                    execute(check_os,hosts=ip_scope)
+            else:
+                with settings(
+                    hide('warnings', 'running', 'stdout', 'stderr'),
+                    warn_only=True,
+                    shell="/bin/sh -c",
+                    timeout=TIMEOUT
+                ):
+                    print "Running Serial"
+                    env.skip_bad_hosts=True
+                    execute(check_os,hosts=ip_scope)
             sys.exit(0)
 
 if __name__ == '__main__':
