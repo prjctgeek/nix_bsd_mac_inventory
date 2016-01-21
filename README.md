@@ -15,7 +15,7 @@ Supported targets:
 -----------------------------
 * python 2.7.x
 * requests
-* paramiko 
+* fabric
 * netaddr
 * This script works with Device42 5.10.2 and above
     
