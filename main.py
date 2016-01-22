@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
 """
 Rework device42 inventory script to use fabric for ssh connections
@@ -153,6 +153,9 @@ def main():
         # Otherwise if use_key_file is true, but no key file is named, fabric will use keys in ~/.ssh
         if USE_KEY_FILE and KEY_FILE:
             env.key_filename = KEY_FILE
+        #Respect the thread parameter
+        if THREADS:
+            env.pool_size=THREADS
 
         if not ip_scope:
             msg =  '[!] Empty IP address scope! Please, check target IP address[es].'
