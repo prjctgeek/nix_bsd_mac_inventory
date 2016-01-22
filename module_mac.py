@@ -32,7 +32,7 @@ class GetMacData():
 
     def execute(self, cmd, needroot = False):
         if needroot:
-            output = sudo(cmd, combine_stderr=False)
+            output = sudo(cmd, combine_stderr=False, shell=False)
             if self.DEBUG:
                 print '[-] DEBUG: sudo(%s)' % cmd
         else:

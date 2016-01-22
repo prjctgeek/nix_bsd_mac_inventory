@@ -48,13 +48,13 @@ class GetLinuxData():
 
     def execute(self, cmd, needroot = False):
         if needroot and self.root == False:
-            output = sudo(cmd, combine_stderr=False)
             if self.DEBUG:
                 print '[-] DEBUG: sudo(%s)' % cmd
+            output = sudo(cmd, combine_stderr=False, shell=False)
         else:
-            output = run(cmd, combine_stderr=False)
             if self.DEBUG:
                 print '[-] DEBUG: run(%s)' % cmd
+            output = run(cmd, combine_stderr=False)
         data_err = output.stderr
         data_out = output.stdout
         # some OSes do not have sudo by default! We can try some of the commands without it (cat /proc/meminfo....)
