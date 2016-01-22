@@ -10,8 +10,6 @@ from fabric.api import *
 class GetMacData():
     def __init__(self, GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, \
                         GET_CPU_INFO, GET_MEMORY_INFO, IGNORE_DOMAIN, UPLOAD_IPV6, DEBUG):
-        self.USE_KEY_FILE            = USE_KEY_FILE
-        self.KEY_FILE                   = KEY_FILE
         self.GET_SERIAL_INFO       = GET_SERIAL_INFO
         self.GET_HARDWARE_INFO  = GET_HARDWARE_INFO
         self.GET_OS_DETAILS        = GET_OS_DETAILS
