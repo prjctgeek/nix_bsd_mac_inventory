@@ -146,34 +146,35 @@ def main():
         ipops = ipop.IP_Operations(TARGETS, CREDENTIALS)
         ip_scope,passwords = ipops.sort_ip()
 
+        # If there are passwords already set, we should be able to run parallel
+        parallel=False
+        if passwords:
+            print "Running parallel"
+            parallel=True
+
+        # If use_key_file is set to false in the config, set no_keys to true so fabric doesn't try to use key files
+        if USE_KEY_FILE == False:
+            env.no_keys = True
+        # If use_key_file is set to true and a key file is named, set the variable for fabric to know where the key is
+        # Otherwise if use_key_file is true, but no key file is named, fabric will use keys in ~/.ssh
+        if USE_KEY_FILE and KEY_FILE:
+            env.key_filename = KEY_FILE
+
         if not ip_scope:
             msg =  '[!] Empty IP address scope! Please, check target IP address[es].'
             print msg
             sys.exit()
         else:
-            if passwords:
-                with settings(
-                    hide('warnings', 'running', 'stdout', 'stderr'),
-                    warn_only=True,
-                    shell="/bin/sh -c",
-                    timeout=TIMEOUT,
-                    parallel=True
-                ):
-                    print "Running parallel"
-                    env.passwords = passwords
-                    print env.passwords
-                    env.skip_bad_hosts=True
-                    execute(check_os,hosts=ip_scope)
-            else:
-                with settings(
-                    hide('warnings', 'running', 'stdout', 'stderr'),
-                    warn_only=True,
-                    shell="/bin/sh -c",
-                    timeout=TIMEOUT
-                ):
-                    print "Running Serial"
-                    env.skip_bad_hosts=True
-                    execute(check_os,hosts=ip_scope)
+            with settings(
+                hide('warnings', 'running', 'stdout', 'stderr'),
+                warn_only=True,
+                shell="/bin/sh -c",
+                timeout=TIMEOUT,
+                parallel=parallel,
+                passwords=passwords,
+            ):
+                env.skip_bad_hosts=True
+                execute(check_os,hosts=ip_scope)
             sys.exit(0)
 
 if __name__ == '__main__':
