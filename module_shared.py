@@ -94,10 +94,10 @@ else:
         if CR.lower() in ('none', 'false', 'true'):
             CREDENTIALS = ast.literal_eval(CR)
         else:
-            CREDENTIALS = CR
+            env.password = CR
 
     else:
         print '\n[!] Wrong number of args. '
         print ' '.join(sys.argv[1:])
-        print '[-] main.py TARGET USE_KEY_FILE KEY_FILE CREDENTIALS'
+        print '[-] main.py USERNAME@TARGET USE_KEY_FILE KEY_FILE CREDENTIALS'
         sys.exit()

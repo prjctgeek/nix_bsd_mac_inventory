@@ -1,7 +1,13 @@
 import sys
 from module_shared import *
 from main import *
-data = check_os(TARGETS)
+from fabric.api import execute
+with settings(
+    hide('warnings', 'running', 'stdout', 'stderr'),
+    warn_only=True,
+    shell="/bin/sh -c",
+):
+    data = execute(check_os, hosts=[TARGETS])
 print data
 
 # Upload handling code goes here. Please take look @ notes bellow
@@ -13,15 +19,10 @@ print data
 
 Syntax:
 -------
-starter.py TARGET USE_KEY_FILE KEY_FILE CREDENTIALS
+starter.py TARGET USE_KEY_FILE KEY_FILE PASSWORD
 If not used,  KEY_FILE should be Python type 'None'.
 Example:
 starter.py 192.168.3.101  False None root:P@ssw0rd
-
-
-Multiple credentials are supported:
------------------------------------
-starter.py 192.168.3.102  False None root:P@ssw0rd,korisnik:P@ssw0rd
 starter.py 192.168.3.102  True ./id_rsa root
 
 
