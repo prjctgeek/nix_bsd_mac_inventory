@@ -5,7 +5,7 @@ Rework device42 inventory script to use fabric for ssh connections
 Parallel work will be done differently
 """
 
-__version__ = "3.0"
+__version__ = "3.1"
 
 # Import Fabric API
 from fabric.api import *
