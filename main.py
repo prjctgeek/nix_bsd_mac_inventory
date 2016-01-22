@@ -13,12 +13,6 @@ from fabric.api import *
 #import custom modules
 import util_uploader as uploader
 import util_ip_operations as ipop
-import module_linux as ml
-import module_solaris as ms
-import module_mac as mc
-import module_freebsd as freebsd
-import module_openbsd as openbsd
-import module_aix as aix
 
 def upload(data):
     name = None
@@ -62,6 +56,7 @@ def upload(data):
         rest.post_parts(hdd_parts)
 def get_linux_data():
     if MOD_LINUX:
+        import module_linux as ml
         print '[+] Collecting data from: %s' % env.host_string
         linux = ml.GetLinuxData(GET_SERIAL_INFO, ADD_HDD_AS_DEVICE_PROPERTIES, ADD_HDD_AS_PARTS, \
                                 GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
@@ -73,6 +68,7 @@ def get_linux_data():
 
 def get_solaris_data():
     if MOD_SOLARIS:
+        import module_solaris as ms
         solaris = ms.GetSolarisData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
                                 IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
         data = solaris.main()
@@ -83,6 +79,7 @@ def get_solaris_data():
 
 def get_aix_data():
     if MOD_AIX:
+        import module_aix as aix
         aix = ms.GetAixData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
                                 IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
         data = aix.main()
@@ -92,6 +89,7 @@ def get_aix_data():
 
 def get_openbsd_data():
     if MOD_BSD:
+        import module_openbsd as openbsd
         openbsd = ms.GetOpenbsdData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
                                 IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
         data = openbsd.main()
@@ -101,6 +99,7 @@ def get_openbsd_data():
 
 def get_freebsd_data():
     if MOD_BSD:
+        import module_freebsd as freebsd
         freebsd = ms.GetFreebsdData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
                                 IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
         data = freebsd.main()
@@ -110,6 +109,7 @@ def get_freebsd_data():
 
 def get_mac_data():
     if MOD_MAC:
+        import module_mac as mc
         mac = ms.GetMacData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
                                 IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
         data = mac.main()
