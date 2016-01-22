@@ -30,7 +30,7 @@ def get_settings():
     secret         = cc.get('settings', 'secret')
     if secret in ('None',' ',''):
         import getpass
-        secret=getpass.getpass('Device42 password: ')
+        secret=getpass.getpass('Device42 password for '+username+': ')
     #targets  ------------------------------------------------------------------------
     targets        = cc.get('targets', 'targets')
     # credentials  --------------------------------------------------------------------
