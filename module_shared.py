@@ -25,7 +25,12 @@ def get_settings():
     # settings ------------------------------------------------------------------------
     base_url       = cc.get('settings', 'base_url')
     username       = cc.get('settings', 'username')
+    if username in ('None',' ',''):
+        username = raw_input('Device42 username: ')
     secret         = cc.get('settings', 'secret')
+    if secret in ('None',' ',''):
+        import getpass
+        secret=getpass.getpass('Device42 password: ')
     #targets  ------------------------------------------------------------------------
     targets        = cc.get('targets', 'targets')
     # credentials  --------------------------------------------------------------------

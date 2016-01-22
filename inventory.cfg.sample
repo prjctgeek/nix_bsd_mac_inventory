@@ -10,7 +10,7 @@ aix      = True
 # base_url points to your Device42 server
 # For example: base_url = https://192.168.1.50
 base_url   =  https://
-# Device42 username and password
+# Device42 username and password - Will be asked for if missing
 username   =  admin
 secret     =  adm!nd42
 
@@ -20,7 +20,7 @@ secret     =  adm!nd42
 # range: 192.168.1.101-192.168.1.150
 # cidr block: 192.168.1.0/24
 # any combination of above: 192.168.3.0/24,192.168.4.1-192.168.4.10,192.168.55.22,10.0.0.0/24
-# A username can be associated with any single, range or cidr block. Without a username, 
+# A username can be associated with any single, range or cidr block. Without a username,
 # the username of the user running the script is assumed
 # For example: username@192.168.1.0/24 or root@192.168.101-192.168.1.150
 # In addition, a port can be added to each target
