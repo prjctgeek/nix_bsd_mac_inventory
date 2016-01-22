@@ -146,12 +146,6 @@ def main():
         ipops = ipop.IP_Operations(TARGETS, CREDENTIALS)
         ip_scope,passwords = ipops.sort_ip()
 
-        # If there are passwords already set, we should be able to run parallel
-        parallel=False
-        if passwords:
-            print "Running parallel"
-            parallel=True
-
         # If use_key_file is set to false in the config, set no_keys to true so fabric doesn't try to use key files
         if USE_KEY_FILE == False:
             env.no_keys = True
@@ -170,7 +164,7 @@ def main():
                 warn_only=True,
                 shell="/bin/sh -c",
                 timeout=TIMEOUT,
-                parallel=parallel,
+                parallel=RUN_PARALLEL,
                 passwords=passwords,
             ):
                 env.skip_bad_hosts=True

@@ -63,4 +63,4 @@ add_hdd_as_device_properties	= False
 debug              			= True
 threads            			= 50
 dict_output        			= False
-
+run_parallel				= True

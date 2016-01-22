@@ -49,11 +49,12 @@ def get_settings():
     debug                       = cc.getboolean('options', 'debug')
     threads                     = cc.get('options', 'threads')
     dict_output                 = cc.getboolean('options', 'dict_output')
+    run_parallel                = cc.getboolean('options', 'run_parallel')
 
     return   mod_linux, mod_solaris,  mod_mac, mod_bsd, mod_aix, base_url, username, secret, targets, \
                 use_key_file, key_file, credentials,  timeout, get_serial_info, duplicate_serials,\
                 add_hdd_as_device_properties, add_hdd_as_parts, get_hardware_info, get_os_details, get_cpu_info, \
-                get_memory_info,ignore_domain, upload_ipv6, debug, threads,  dict_output, give_hostname_precedence
+                get_memory_info,ignore_domain, upload_ipv6, debug, threads,  dict_output, give_hostname_precedence, run_parallel
 
 caller = os.path.basename(sys._getframe().f_back.f_code.co_filename)
 
@@ -62,7 +63,7 @@ if caller == 'main.py':
     USERNAME, SECRET, TARGETS, USE_KEY_FILE, KEY_FILE, \
     CREDENTIALS, TIMEOUT, GET_SERIAL_INFO, DUPLICATE_SERIALS, ADD_HDD_AS_DEVICE_PROPERTIES, \
     ADD_HDD_AS_PARTS, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, IGNORE_DOMAIN, \
-    UPLOAD_IPV6, DEBUG, THREADS, DICT_OUTPUT, GIVE_HOSTNAME_PRECEDENCE = get_settings()
+    UPLOAD_IPV6, DEBUG, THREADS, DICT_OUTPUT, GIVE_HOSTNAME_PRECEDENCE, RUN_PARALLEL = get_settings()
     TIMEOUT         = int(TIMEOUT)
 
 else:
@@ -71,7 +72,7 @@ else:
         USERNAME, SECRET, xTARGETS, xUSE_KEY_FILE, xKEY_FILE, \
         xCREDENTIALS, TIMEOUT, GET_SERIAL_INFO, DUPLICATE_SERIALS, ADD_HDD_AS_DEVICE_PROPERTIES, \
         ADD_HDD_AS_PARTS, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, IGNORE_DOMAIN, \
-        UPLOAD_IPV6, DEBUG, THREADS, DICT_OUTPUT, GIVE_HOSTNAME_PRECEDENCE = get_settings()
+        UPLOAD_IPV6, DEBUG, THREADS, DICT_OUTPUT, GIVE_HOSTNAME_PRECEDENCE, RUN_PARALLEL = get_settings()
         TIMEOUT         = int(TIMEOUT)
         TARGETS         = sys.argv[1].strip()
         USE_KEY_FILE    = ast.literal_eval(sys.argv[2].strip().capitalize())
