@@ -61,55 +61,61 @@ def upload(data):
     if hdd_parts:
         rest.post_parts(hdd_parts)
 def get_linux_data():
-    print '[+] Collecting data from: %s' % env.host_string
-    linux = ml.GetLinuxData(GET_SERIAL_INFO, ADD_HDD_AS_DEVICE_PROPERTIES, ADD_HDD_AS_PARTS, \
-                            GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
-                            IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
-    data = linux.main()
-    if DEBUG:
-        print 'Linux data: ', data
-    return data
+    if MOD_LINUX:
+        print '[+] Collecting data from: %s' % env.host_string
+        linux = ml.GetLinuxData(GET_SERIAL_INFO, ADD_HDD_AS_DEVICE_PROPERTIES, ADD_HDD_AS_PARTS, \
+                                GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
+                                IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
+        data = linux.main()
+        if DEBUG:
+            print 'Linux data: ', data
+        return data
 
 def get_solaris_data():
-    solaris = ms.GetSolarisData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
-                            IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
-    data = solaris.main()
-    if DEBUG:
-        print 'Solaris data: ', data
-    return data
+    if MOD_SOLARIS:
+        solaris = ms.GetSolarisData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
+                                IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
+        data = solaris.main()
+        if DEBUG:
+            print 'Solaris data: ', data
+        return data
 
 
 def get_aix_data():
-    aix = ms.GetAixData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
-                            IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
-    data = aix.main()
-    if DEBUG:
-        print 'Aix data: ', data
-    return data
+    if MOD_AIX:
+        aix = ms.GetAixData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
+                                IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
+        data = aix.main()
+        if DEBUG:
+            print 'Aix data: ', data
+        return data
 
 def get_openbsd_data():
-    openbsd = ms.GetOpenbsdData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
-                            IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
-    data = openbsd.main()
-    if DEBUG:
-        print 'Openbsd data: ', data
-    return data
+    if MOD_BSD:
+        openbsd = ms.GetOpenbsdData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
+                                IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
+        data = openbsd.main()
+        if DEBUG:
+            print 'Openbsd data: ', data
+        return data
 
 def get_freebsd_data():
-    freebsd = ms.GetFreebsdData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
-                            IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
-    data = freebsd.main()
-    if DEBUG:
-        print 'Freebsd data: ', data
-    return data
+    if MOD_BSD:
+        freebsd = ms.GetFreebsdData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
+                                IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
+        data = freebsd.main()
+        if DEBUG:
+            print 'Freebsd data: ', data
+        return data
 
 def get_mac_data():
-    mac = ms.GetMacData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
-                            IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
-    data = mac.main()
-    if DEBUG:
-        print 'Mac data: ', data
-    return data
+    if MOD_MAC:
+        mac = ms.GetMacData(GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, GET_CPU_INFO, GET_MEMORY_INFO, \
+                                IGNORE_DOMAIN, UPLOAD_IPV6, GIVE_HOSTNAME_PRECEDENCE, DEBUG)
+        data = mac.main()
+        if DEBUG:
+            print 'Mac data: ', data
+        return data
 
 def check_os():
     #global SUCCESS
