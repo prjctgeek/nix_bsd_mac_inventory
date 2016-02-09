@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 
 __version__ = "3.0"
 
@@ -69,7 +71,7 @@ def upload(data):
 def get_linux_data(ip, usr, pwd):
     if MOD_LINUX:
         lock.acquire()
-        print '[+] Collecting data from: %s' % ip
+        print('[+] Collecting data from: %s' % ip)
         lock.release()
         linux = ml.GetLinuxData(BASE_URL, USERNAME, SECRET, ip, SSH_PORT, TIMEOUT,  usr, pwd, USE_KEY_FILE, KEY_FILE,
                                     GET_SERIAL_INFO, ADD_HDD_AS_DEVICE_PROPERTIES, ADD_HDD_AS_PARTS,
@@ -79,9 +81,9 @@ def get_linux_data(ip, usr, pwd):
         data = linux.main()
         if DEBUG:
             lock.acquire()
-            print '\nLinux data: '
+            print('\nLinux data: ')
             for rec in data:
-                print rec
+                print(rec)
             lock.release()
         if DICT_OUTPUT:
             return data
@@ -98,7 +100,7 @@ def get_solaris_data(ip, usr, pwd):
         data = solaris.main()
         if DEBUG:
             lock.acquire()
-            print '\nSolaris data: ', data
+            print('\nSolaris data: ', data)
             lock.release()
         if DICT_OUTPUT:
             return data
@@ -110,7 +112,7 @@ def get_solaris_data(ip, usr, pwd):
 def get_mac_data(ip, usr, pwd):
     if MOD_MAC:
         lock.acquire()
-        print '[+] Collecting data from: %s' % ip
+        print('[+] Collecting data from: %s' % ip)
         lock.release()
         mac = mc.GetMacData(BASE_URL, USERNAME, SECRET, ip, SSH_PORT, TIMEOUT,  usr, pwd, USE_KEY_FILE, KEY_FILE, \
                                     GET_SERIAL_INFO, GET_HARDWARE_INFO, GET_OS_DETAILS, \
@@ -119,7 +121,7 @@ def get_mac_data(ip, usr, pwd):
         data = mac.main()
         if DEBUG:
             lock.acquire()
-            print 'Mac OS X data: ', data
+            print('Mac OS X data: ', data)
             lock.release()
         if DICT_OUTPUT:
             return data
@@ -136,7 +138,7 @@ def get_freebsd_data(ip, usr, pwd):
         data = solaris.main()
         if DEBUG:
             lock.acquire()
-            print 'FreeBSD data: ', data
+            print('FreeBSD data: ', data)
             lock.release()
         if DICT_OUTPUT:
             return data
@@ -153,7 +155,7 @@ def get_openbsd_data(ip, usr, pwd):
         data = bsd.main()
         if DEBUG:
             lock.acquire()
-            print 'OpenBSD data: ', data
+            print('OpenBSD data: ', data)
             lock.release()
         if DICT_OUTPUT:
             return data
@@ -170,7 +172,7 @@ def get_aix_data(ip, usr, pwd):
         data = ibm.main()
         if DEBUG:
             lock.acquire()
-            print 'AIX data: ', data
+            print('AIX data: ', data)
             lock.release()
         if DICT_OUTPUT:
             return data
@@ -183,44 +185,44 @@ def process_data(data_out, ip, usr, pwd):
     msg = str(data_out).lower()
     if 'linux' in msg:
         lock.acquire()
-        print '[+] Linux running @ %s ' % ip
+        print('[+] Linux running @ %s ' % ip)
         lock.release()
         data = get_linux_data(ip, usr, pwd)
         return data
     elif 'solaris' in msg or 'sunos' in msg:
         lock.acquire()
-        print '[+] Solaris running @ %s ' % ip
+        print('[+] Solaris running @ %s ' % ip)
         lock.release()
         data = get_solaris_data(ip, usr, pwd)
         return data
     elif 'freebsd' in msg:
         lock.acquire()
-        print '[+] FreeBSD running @ %s ' % ip
+        print('[+] FreeBSD running @ %s ' % ip)
         lock.release()
         data = get_freebsd_data(ip, usr, pwd)
         return data
     elif 'openbsd' in msg:
         lock.acquire()
-        print '[+] OpenBSD running @ %s ' % ip
+        print('[+] OpenBSD running @ %s ' % ip)
         lock.release()
         data = get_openbsd_data(ip, usr, pwd)
         return data
     elif 'darwin' in msg:
         lock.acquire()
-        print '[+] Mac OS X running @ %s' % ip
+        print('[+] Mac OS X running @ %s' % ip)
         lock.release()
         data = get_mac_data(ip, usr, pwd)
         return data
     elif 'aix' in msg:
         lock.acquire()
-        print '[+] IBM AIX running @ %s' % ip
+        print('[+] IBM AIX running @ %s' % ip)
         lock.release()
         data = get_aix_data(ip, usr, pwd)
         return data
     else:
         lock.acquire()
-        print '[!] Connected to SSH @ %s, but the OS cannot be determined.' % ip
-        print '\tInfo: %s\n\tSkipping... ' % str(msg)
+        print('[!] Connected to SSH @ %s, but the OS cannot be determined.' % ip)
+        print('\tInfo: %s\n\tSkipping... ' % str(msg))
         lock.release()
         return
     
@@ -238,12 +240,12 @@ def check_os(ip):
                 try:
                     usr, pwd = cred.split(':')
                 except ValueError:
-                    print '\n[!] Error. \n\tPlease check credentials formatting. It should look like user:password\n'
+                    print('\n[!] Error. \n\tPlease check credentials formatting. It should look like user:password\n')
                     sys.exit()
             if not SUCCESS:
                 try:
                     lock.acquire()
-                    print '[*] Connecting to %s:%s as "%s"' % (ip, SSH_PORT, usr)
+                    print('[*] Connecting to %s:%s as "%s"' % (ip, SSH_PORT, usr))
                     lock.release()
                     ssh.connect(ip, username=usr, password=pwd, timeout=TIMEOUT)
                     stdin, stdout, stderr = ssh.exec_command("uname -a")
@@ -255,26 +257,26 @@ def check_os(ip):
                         return data
                     else:
                         lock.acquire()
-                        print '[!] Connected to SSH @ %s, but the OS cannot be determined. ' % ip
+                        print('[!] Connected to SSH @ %s, but the OS cannot be determined. ' % ip)
                         lock.release()
 
                 except(paramiko.AuthenticationException):
                     lock.acquire()
-                    print '[!] Could not authenticate to %s as user "%s"' % (ip, usr)
+                    print('[!] Could not authenticate to %s as user "%s"' % (ip, usr))
                     lock.release()
                     
                 except(socket.error):
                     lock.acquire()
-                    print '[!] Timeout %s ' % ip
+                    print('[!] Timeout %s ' % ip)
                     lock.release()
                     
                 except Exception, e:
-                    print e
+                    print(e)
     else:
         if CREDENTIALS.lower() in ('none', 'false', 'true'):
-            print '\n[!] Error!. You must specify user name!'
-            print '[-] starter.py 192.168.3.102  True ./id_rsa root'
-            print '[!] Exiting...'
+            print('\n[!] Error!. You must specify user name!')
+            print('[-] starter.py 192.168.3.102  True ./id_rsa root')
+            print('[!] Exiting...')
             sys.exit()
         try:
             if ':' in CREDENTIALS:
@@ -282,7 +284,7 @@ def check_os(ip):
             else:
                 usr = CREDENTIALS
                 pwd = None
-            print '[*] Connecting to %s:%s as "%s" using key file.' % (ip, SSH_PORT, usr)
+            print('[*] Connecting to %s:%s as "%s" using key file.' % (ip, SSH_PORT, usr))
             ssh.connect(ip, username=usr, key_filename=KEY_FILE, timeout=TIMEOUT)
             stdin, stdout, stderr = ssh.exec_command("uname -a")
             data_out  = stdout.readlines()
@@ -293,31 +295,31 @@ def check_os(ip):
 
             else:
                 lock.acquire()
-                print '[!] Connected to SSH @ %s, but the OS cannot be determined. ' % ip
+                print('[!] Connected to SSH @ %s, but the OS cannot be determined. ' % ip)
                 lock.release()
 
         except(paramiko.AuthenticationException):
             lock.acquire()
-            print '[!] Could not authenticate to %s as user "%s"' % (ip, usr)
+            print('[!] Could not authenticate to %s as user "%s"' % (ip, usr))
             lock.release()
 
         except(socket.error):
             lock.acquire()
-            print '[!] Timeout %s ' % ip
+            print('[!] Timeout %s ' % ip)
             lock.release()
 
         except Exception, e:
             if str(e) == 'not a valid EC private key file':
-                print '\n[!] Error: Could not login probably due to the wrong username or key file.'
+                print('\n[!] Error: Could not login probably due to the wrong username or key file.')
             else:
-                print e
+                print(e)
 
 
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(float(TIMEOUT))
     msg = '\r\n[!] Running %s threads.' % THREADS
-    print msg
+    print(msg)
     # parse IP address [single or CIDR]
     if TARGETS:
         ipops = ipop.IP_Operations(TARGETS)
@@ -325,7 +327,7 @@ def main():
 
         if not ip_scope:
             msg =  '[!] Empty IP address scope! Please, check target IP address[es].'
-            print msg
+            print(msg)
             sys.exit()
         else:
             if len(ip_scope) == 1:
@@ -351,11 +353,11 @@ def main():
                     tcount = threading.active_count()
                     msg =  '[_] Waiting for threads to finish. Current thread count: %s' % str(tcount)
                     lock.acquire()
-                    print msg
+                    print(msg)
                     lock.release()
                 
                 msg =  '\n[!] Done!'
-                print msg
+                print(msg)
             
 
 

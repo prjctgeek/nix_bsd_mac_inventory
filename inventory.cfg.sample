@@ -56,4 +56,4 @@ give_hostname_precedence	= False
 debug              			= True
 threads            			= 50
 dict_output        			= False
-
+add_hdd_as_device_properties		= False
